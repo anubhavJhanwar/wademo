@@ -1,0 +1,143 @@
+#wa-crm-header-bar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 100vh;
+  background: #181f21;
+  border-left: 1px solid #222c2e;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: -1px 0 4px rgba(0,0,0,0.04);
+}
+.wa-crm-header-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+}
+.profile-placeholder {
+  width: 36px;
+  height: 36px;
+  background: #333;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+.wa-crm-header-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  justify-content: center;
+}
+.wa-crm-header-btn {
+  background: none;
+  border: none;
+  color: #25d366;
+  font-size: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  cursor: pointer;
+  margin: 0;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wa-crm-header-btn:active, .wa-crm-header-btn:focus {
+  background: #075e54;
+  color: #25d366;
+  outline: none;
+}
+.wa-crm-header-btn:hover {
+  background: #333;
+}
+.logout-btn {
+  background: none;
+  border: none;
+  color: #25d366;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 0;
+  border-radius: 16px;
+  margin-top: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.logout-btn:hover {
+  background: #222c2e;
+}
+
+/* Top horizontal bar styles */
+#wa-crm-top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: calc(100vw - 60px);
+  height: 48px;
+  background: #181f21;
+  border-bottom: 1px solid #222c2e;
+  z-index: 999998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.wa-crm-top-inner {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+}
+.wa-crm-top-buttons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.wa-crm-top-btn {
+  background: none;
+  border: none;
+  color: #25d366;
+  font-size: 16px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.wa-crm-top-btn:active, .wa-crm-top-btn:focus {
+  background: #075e54;
+  color: #25d366;
+  outline: none;
+}
+.wa-crm-top-btn:hover {
+  background: #333;
+}
+
+/* Adjust WhatsApp main content to not be covered by both bars */
+.app, #app, main, ._3Bc7H {
+  margin-right: 60px !important;
+  margin-top: 48px !important;
+}
+body {
+  /* Add top padding to prevent content from being hidden under the bar */
+  padding-top: 28px !important;
+} 

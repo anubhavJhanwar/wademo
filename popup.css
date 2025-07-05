@@ -1,0 +1,62 @@
+.header-bar {
+  display: flex;
+  background: #222c2e;
+  padding: 0 16px;
+  height: 48px;
+  align-items: center;
+  border-bottom: 1px solid #222c2e;
+  overflow-x: auto;
+}
+.header-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  margin: 0 12px;
+  padding: 8px 12px;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.header-btn.active, .header-btn:focus {
+  background: #075e54;
+  color: #25d366;
+  outline: none;
+}
+.header-btn:hover {
+  background: #333;
+}
+.top-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #181f21;
+  height: 32px;
+  padding: 0 12px;
+  border-bottom: 1px solid #222c2e;
+}
+.profile-placeholder {
+  width: 24px;
+  height: 24px;
+  background: #333;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+.logout-btn {
+  background: none;
+  border: none;
+  color: #25d366;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 16px;
+  transition: background 0.2s;
+}
+.logout-btn:hover {
+  background: #222c2e;
+} 
