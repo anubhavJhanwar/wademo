@@ -13,6 +13,62 @@
   justify-content: space-between;
   box-shadow: -1px 0 4px rgba(0,0,0,0.04);
 }
+
+/* Sleek right-hand sidebar */
+#wa-crm-right-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 100vh;
+  background: #181f21; /* Same as top bar */
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: -1px 0 4px rgba(0,0,0,0.04);
+}
+
+.wa-crm-right-sidebar-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 0 10px;
+}
+
+.wa-crm-logo-item {
+  width: 50px;
+  height: 50px;
+  background: #333;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.wa-crm-logo-item:hover {
+  background: #444;
+  border-color: #25d366;
+  transform: scale(1.05);
+}
+
+.wa-crm-logo-item img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.wa-crm-logo-item.active {
+  background: #075e54;
+  border-color: #25d366;
+}
+
 .wa-crm-header-inner {
   width: 100%;
   height: 100%;
@@ -88,9 +144,9 @@
 
 /* Top horizontal bar styles */
 #wa-crm-top-bar {
+  /* Removed position: fixed and top/left/right for natural flow */
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 1px !important;
   width: calc(100vw - 60px);
   height: 48px;
   background: #181f21;
@@ -100,6 +156,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+ 
 }
 .wa-crm-top-inner {
   width: 100%;
@@ -132,12 +189,35 @@
   background: #333;
 }
 
-/* Adjust WhatsApp main content to not be covered by both bars */
+/* Adjust WhatsApp main content to not be covered by the sidebar */
 .app, #app, main, ._3Bc7H {
   margin-right: 60px !important;
-  margin-top: 48px !important;
 }
 body {
   /* Add top padding to prevent content from being hidden under the bar */
   padding-top: 28px !important;
+} 
+
+/* Wrapper for scaled WhatsApp UI */
+#wa-crm-wa-wrapper {
+  position: fixed;
+  top: 48px; /* height of top bar */
+  left: 0;
+  right: 60px; /* width of sidebar */
+  bottom: 0;
+  width: calc(100vw - 60px);
+  height: calc(100vh - 48px);
+  overflow: hidden;
+  z-index: 1;
+  background: #111; /* optional, for contrast */
+  display: flex;
+} 
+
+#wa-crm-wa-wrapper > #app,
+#wa-crm-wa-wrapper > .app {
+  width: 100%;
+  height: 100%;
+  transform: scale(0.96); /* adjust as needed */
+  transform-origin: top left;
+  background: #111;
 } 
