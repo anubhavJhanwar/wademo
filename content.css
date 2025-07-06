@@ -217,7 +217,7 @@ body {
 #wa-crm-wa-wrapper > .app {
   width: 100%;
   height: 100%;
-  transform: scale(0.96); /* adjust as needed */
+  transform: scale(1); /* adjust as needed */
   transform-origin: top left;
   background: #111;
 } 
