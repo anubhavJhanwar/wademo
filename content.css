@@ -21,7 +21,7 @@
   right: 0;
   width: 60px;
   height: 100vh;
-  background: #181f21; /* Same as top bar */
+  background: rgb(29, 31, 31); /* Same as top bar */
   z-index: 999999;
   display: flex;
   flex-direction: column;
@@ -40,16 +40,49 @@
 }
 
 .wa-crm-logo-item {
-  width: 50px;
-  height: 50px;
-  background: #333;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
+  background: transparent;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: 2px solid transparent;
+  margin: 10px 0;
+  transition: background 0.2s;
+  border: none;
+}
+
+.wa-crm-logo-item {
+  position: relative;
+}
+
+.wa-crm-logo-item[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 120%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #222c2e;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  font-size: 13px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 10000;
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.wa-crm-logo-item[data-tooltip]::after {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.wa-crm-logo-item[data-tooltip]:hover::after {
+  opacity: 1;
 }
 
 .wa-crm-logo-item:hover {
@@ -59,9 +92,12 @@
 }
 
 .wa-crm-logo-item img {
-  width: 30px;
-  height: 30px;
+  width: 23px;
+  height: 23px;
   object-fit: contain;
+  display: block;
+  filter: brightness(0.6) invert(1);
+  opacity: 0.7;
 }
 
 .wa-crm-logo-item.active {
@@ -149,8 +185,8 @@
   top: 1px !important;
   width: calc(100vw - 60px);
   height: 48px;
-  background: #181f21;
-  border-bottom: 1px solid #222c2e;
+  background: rgb(29, 31, 31);
+  border-bottom: rgb(29, 31, 31);
   z-index: 999998;
   display: flex;
   align-items: center;
@@ -221,3 +257,41 @@ body {
   transform-origin: top left;
   background: #111;
 } 
+
+
+#sidebar-icon-adminPanel img{
+      width:24px !important;
+      height:24px !important;
+    }
+    #sidebar-icon-adminPanel {
+      width: 40px !important;
+      height: 40px !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+/* Force icon4 to match others */
+    #sidebar-icon-contactBook img {
+      width: 24px !important;
+      height: 24px !important;
+      object-fit: contain;
+      display: block;
+      filter: brightness(0.7) invert(1);
+      opacity: 0.7;
+    }
+    #sidebar-icon-contactBook {
+      width: 40px !important;
+      height: 40px !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    #sidebar-icon-contactBook:hover {
+      background: #444;
+  
+      transform: scale(1.05) !important;
+    }
+

@@ -51,3 +51,38 @@ if (document.readyState === 'loading') {
 injectCRMTopBar();
 const observer = new MutationObserver(injectCRMTopBar);
 observer.observe(document.body, { childList: true, subtree: true }); 
+
+// ADDING ICONS TO RIGHT SIDE BAR 
+
+const iconFiles = [
+  {src: 'icons/icon1.png', id: 'sidebar-icon-home'},
+  {src: 'icons/icon2.png', id: 'sidebar-icon-notification'},
+  {src: 'icons/icon3.png', id: 'sidebar-icon-contact'},
+  {src: 'icons/icon4.png', id: 'sidebar-icon-contactBook'},
+  {src: 'icons/icon5.png', id: 'sidebar-icon-addContact'},
+  {src: 'icons/icon6.png', id: 'sidebar-icon-settings'},
+  {src: 'icons/icon7.png', id: 'sidebar-icon-refresh'},
+  {src: 'icons/icon8.png', id: 'sidebar-icon-adminPanel'},
+]
+
+function addPngIconsToSidebar() {
+  const sidebar = document.getElementById('wa-crm-right-sidebar');
+  if (sidebar) {
+    sidebar.innerHTML = ''; // Clear previous content
+
+    iconFiles.forEach(icon => {
+      const iconDiv = document.createElement('div');
+      iconDiv.className = 'wa-crm-logo-item';
+      iconDiv.id = icon.id; // Assign unique id
+
+      const img = document.createElement('img');
+      img.src = chrome.runtime.getURL(icon.src);
+      img.alt = icon.id;
+
+      iconDiv.appendChild(img);
+      sidebar.appendChild(iconDiv);
+    });
+  }
+}
+
+addPngIconsToSidebar();
