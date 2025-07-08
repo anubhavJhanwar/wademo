@@ -4,13 +4,19 @@ function injectCRMTopBar() {
   if (waApp && !document.getElementById('wa-crm-top-bar')) {
     const topBar = document.createElement('div');
     topBar.id = 'wa-crm-top-bar';
-    topBar.innerHTML = `
+    topBar.innerHTML = `  
       <div class="wa-crm-top-inner">
         <div class="wa-crm-top-buttons">
-          <button class="wa-crm-top-btn" id="wa-crm-dashboard-btn">Dashboard</button>
-          <button class="wa-crm-top-btn" id="wa-crm-tickets-btn">Tickets</button>
-          <button class="wa-crm-top-btn" id="wa-crm-settings-btn">Settings</button>
-          <button class="wa-crm-top-btn" id="wa-crm-flags-btn">Flags</button>
+          <button class="wa-crm-top-btn" id="wa-crm-dashboard-btn">All</button>
+          <button class="wa-crm-top-btn" id="wa-crm-tickets-btn">Unread</button>
+          <button class="wa-crm-top-btn" id="wa-crm-settings-btn">Open</button>
+          <button class="wa-crm-top-btn" id="wa-crm-closed-btn">Closed</button>
+          <button class="wa-crm-top-btn" id="wa-crm-followup-btn">Followup</button>
+          <button class="wa-crm-top-btn" id="wa-crm-respond-btn">Respond</button>
+          <button class="wa-crm-top-btn" id="wa-crm-unknown-btn">Unknown</button>
+          <button class="wa-crm-top-btn" id="wa-crm-groups-btn">Groups</button>
+          <button class="wa-crm-top-btn" id="wa-crm-businesses-btn">Businesses</button>
+          <button class="wa-crm-top-btn" id="wa-crm-brands-btn">Brands</button>
         </div>
       </div>
     `;
