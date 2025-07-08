@@ -9,8 +9,8 @@ function injectCRMTopBar() {
         <div class="wa-crm-top-buttons">
           <button class="wa-crm-top-btn" id="wa-crm-dashboard-btn">All</button>
           <button class="wa-crm-top-btn" id="wa-crm-tickets-btn">Unread</button>
-          <button class="wa-crm-top-btn" id="wa-crm-settings-btn">Open</button>
-          <button class="wa-crm-top-btn" id="wa-crm-closed-btn">Closed</button>
+          <button class="wa-crm-top-btn" id="wa-crm-settings-btn">Active</button>
+          <button class="wa-crm-top-btn" id="wa-crm-closed-btn">Dues</button>
           <button class="wa-crm-top-btn" id="wa-crm-followup-btn">Followup</button>
           <button class="wa-crm-top-btn" id="wa-crm-respond-btn">Respond</button>
           <button class="wa-crm-top-btn" id="wa-crm-unknown-btn">Unknown</button>
