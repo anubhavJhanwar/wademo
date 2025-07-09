@@ -21,10 +21,18 @@ function injectCRMTopBar() {
       </div>
     `;
     waApp.parentNode.insertBefore(topBar, waApp);
-    // Add button events
-    topBar.querySelectorAll('.wa-crm-top-btn').forEach(btn => {
-      btn.addEventListener('click', () => alert(`Clicked: ${btn.textContent}`));
-    });
+    // Remove default alert for all top bar buttons
+    // Only custom handlers will be added elsewhere
+    // Attach Unread handler here
+    const unreadBtn = document.getElementById('wa-crm-tickets-btn');
+    if (unreadBtn) {
+      unreadBtn.onclick = function() {
+        const unreadFilter = document.querySelector('#unread-filter');
+        if (unreadFilter) {
+          unreadFilter.click();
+        }
+      };
+    }
   }
 }
 
@@ -203,6 +211,30 @@ function addRefreshClickHandler() {
   }
 }
 
+function addAllTopBarHandler() {
+  const allBtn = document.getElementById('wa-crm-dashboard-btn');
+  if (allBtn) {
+    allBtn.onclick = function() {
+      const allFilter = document.querySelector('#all-filter');
+      if (allFilter) {
+        allFilter.click();
+      }
+    };
+  }
+}
+
+function addGroupsTopBarHandler() {
+  const groupsBtn = document.getElementById('wa-crm-groups-btn');
+  if (groupsBtn) {
+    groupsBtn.onclick = function() {
+      const groupFilter = document.querySelector('#group-filter');
+      if (groupFilter) {
+        groupFilter.click();
+      }
+    };
+  }
+}
+
 // Automatically open pane for unsaved contacts
 const unsavedContactObserver = new MutationObserver(() => {
   // Always fetch latest info
@@ -220,3 +252,5 @@ if (mainChat) {
 addPngIconsToSidebar();
 addAddContactClickHandler();
 addRefreshClickHandler();
+addAllTopBarHandler();
+addGroupsTopBarHandler();
