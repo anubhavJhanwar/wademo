@@ -194,6 +194,15 @@ function addAddContactClickHandler() {
   }
 }
 
+function addRefreshClickHandler() {
+  const refreshIcon = document.getElementById('sidebar-icon-refresh');
+  if (refreshIcon) {
+    refreshIcon.onclick = function() {
+      location.reload();
+    };
+  }
+}
+
 // Automatically open pane for unsaved contacts
 const unsavedContactObserver = new MutationObserver(() => {
   // Always fetch latest info
@@ -210,3 +219,4 @@ if (mainChat) {
 
 addPngIconsToSidebar();
 addAddContactClickHandler();
+addRefreshClickHandler();
