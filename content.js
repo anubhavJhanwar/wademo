@@ -102,58 +102,56 @@ function addPngIconsToSidebar() {
 function openAddContactPane() {
   // Always fetch latest info
   const { name, number, nameFound } = getWhatsAppContactInfo();
-  let pane = document.getElementById('wa-crm-add-contact-pane');
-  if (!pane) {
-    pane = document.createElement('div');
-    pane.id = 'wa-crm-add-contact-pane';
-    pane.style.position = 'fixed';
-    pane.style.top = '52px'; // Add padding for top nav bar
-    pane.style.right = '64px'; // Move left of sidebar (assume sidebar is 64px wide)
-    pane.style.height = 'auto';
-    pane.style.minHeight = '320px'; // Optional: minimum height for aesthetics
-    pane.style.background = 'rgb(255, 255, 255)';
-    pane.style.boxShadow = '-2px 0 8px rgba(0,0,0,0.1)';
-    pane.style.zIndex = '9999';
-    pane.style.width = '320px';
-    pane.style.transition = 'right 0.3s';
-    pane.innerHTML = `
-      <div style="padding: 20px 18px 18px 18px; font-family: sans-serif; height: 100%; display: flex; flex-direction: column;">
-        <div style="padding-bottom: 12px; border-bottom: 1px solid #eee;">
-          <div id="wa-crm-pane-name" style="font-weight: 600; font-size: 18px; color: #222;">${name || ''}</div>
-          <div id="wa-crm-pane-number" style="font-size: 15px; color: #555; margin-top: 2px;">${number || ''}</div>
+  // Only open if the contact is unknown (number is present, name is not found)
+  if (!nameFound && number) {
+    let pane = document.getElementById('wa-crm-add-contact-pane');
+    if (!pane) {
+      pane = document.createElement('div');
+      pane.id = 'wa-crm-add-contact-pane';
+      pane.style.position = 'fixed';
+      pane.style.top = '52px'; // Add padding for top nav bar
+      pane.style.right = '64px'; // Move left of sidebar (assume sidebar is 64px wide)
+      pane.style.height = 'auto';
+      pane.style.minHeight = '320px'; // Optional: minimum height for aesthetics
+      pane.style.background = 'rgb(255, 255, 255)';
+      pane.style.boxShadow = '-2px 0 8px rgba(0,0,0,0.1)';
+      pane.style.zIndex = '9999';
+      pane.style.width = '320px';
+      pane.style.transition = 'right 0.3s';
+      pane.innerHTML = `
+        <div style="padding: 20px 18px 18px 18px; font-family: sans-serif; height: 100%; display: flex; flex-direction: column;">
+          <div style="padding-bottom: 12px; border-bottom: 1px solid #eee;">
+            <div id="wa-crm-pane-name" style="font-weight: 600; font-size: 18px; color: #222;">${name || ''}</div>
+            <div id="wa-crm-pane-number" style="font-size: 15px; color: #555; margin-top: 2px;">${number || ''}</div>
+          </div>
+          <div style="padding: 18px 0 0 0; flex: 1; display: flex; flex-direction: column;">
+            <div style="color: #00bfae; font-size: 18px; font-weight: 600; margin-bottom: 8px;">New Contact!</div>
+            <div style="color: #888; font-size: 14px; margin-bottom: 16px;">This contact is not saved in your CRM yet. To utilize CRM features such as tickets, activities, and chat sync, create a contact first.</div>
+            <label for="wa-crm-contact-name-input" style="font-size: 13px; color: #444; margin-bottom: 6px;">Name</label>
+            <input id="wa-crm-contact-name-input" type="text" value="${name || ''}" style="width: calc(100% - 30px); margin: 0 auto 16px auto; display: block; padding: 8px 10px; border-radius: 6px; border: 1px solid #222; background: #f6f6f6; font-size: 15px;" placeholder="Enter name" />
+            <button id="wa-crm-create-contact-btn" style="background: #2a4bff; color: #fff; border: none; border-radius: 6px; padding: 8px 0; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 12px; width: 140px; align-self: flex-start;">Add to Contacts</button>
+            <div id="wa-crm-google-status"></div>
+          </div>
+          <button id="wa-crm-close-pane" style="position: absolute; top: 10px; right: 10px; background: #eee; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 16px; cursor: pointer;">&times;</button>
         </div>
-        <div style="padding: 18px 0 0 0; flex: 1; display: flex; flex-direction: column;">
-          <div style="color: #00bfae; font-size: 18px; font-weight: 600; margin-bottom: 8px;">New Contact!</div>
-          <div style="color: #888; font-size: 14px; margin-bottom: 16px;">This contact is not saved in your CRM yet. To utilize CRM features such as tickets, activities, and chat sync, create a contact first.</div>
-          <label for="wa-crm-contact-name-input" style="font-size: 13px; color: #444; margin-bottom: 6px;">Name</label>
-          <input id="wa-crm-contact-name-input" type="text" value="${name || ''}" style="width: calc(100% - 30px); margin: 0 auto 16px auto; display: block; padding: 8px 10px; border-radius: 6px; border: 1px solid #222; background: #f6f6f6; font-size: 15px;" ${nameFound ? 'readonly' : ''} placeholder="${nameFound ? '' : 'Enter name'}" />
-          <button id="wa-crm-create-contact-btn" style="background: #2a4bff; color: #fff; border: none; border-radius: 6px; padding: 8px 0; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 12px; width: 140px; align-self: flex-start;">Add to Contacts</button>
-          <div id="wa-crm-google-status"></div>
-        </div>
-        <button id="wa-crm-close-pane" style="position: absolute; top: 10px; right: 10px; background: #eee; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 16px; cursor: pointer;">&times;</button>
-      </div>
-    `;
-    document.body.appendChild(pane);
-    document.getElementById('wa-crm-close-pane').onclick = () => {
-      pane.style.display = 'none';
-    };
-    document.getElementById('wa-crm-create-contact-btn').onclick = () => {
-      // Removed showContactAddedPopup();
-    };
-  } else {
-    // Always update info if pane already exists
-    pane.querySelector('#wa-crm-pane-name').textContent = name || '';
-    pane.querySelector('#wa-crm-pane-number').textContent = number || '';
-    const nameInput = pane.querySelector('#wa-crm-contact-name-input');
-    nameInput.value = name || '';
-    if (nameFound) {
-      nameInput.setAttribute('readonly', '');
-      nameInput.placeholder = '';
+      `;
+      document.body.appendChild(pane);
+      document.getElementById('wa-crm-close-pane').onclick = () => {
+        pane.style.display = 'none';
+      };
+      document.getElementById('wa-crm-create-contact-btn').onclick = () => {
+        alert('Contact added successfully!');
+        pane.style.display = 'none';
+      };
     } else {
-      nameInput.removeAttribute('readonly');
+      // Always update info if pane already exists
+      pane.querySelector('#wa-crm-pane-name').textContent = name || '';
+      pane.querySelector('#wa-crm-pane-number').textContent = number || '';
+      const nameInput = pane.querySelector('#wa-crm-contact-name-input');
+      nameInput.value = name || '';
       nameInput.placeholder = 'Enter name';
+      pane.style.display = 'block';
     }
-    pane.style.display = 'block';
   }
 }
 
@@ -192,12 +190,16 @@ function addAddContactClickHandler() {
   const addContactIcon = document.getElementById('sidebar-icon-addContact');
   if (addContactIcon) {
     addContactIcon.onclick = function() {
-      const pane = document.getElementById('wa-crm-add-contact-pane');
-      if (pane && pane.style.display !== 'none') {
-        pane.style.display = 'none';
-        return;
+      const { nameFound, number } = getWhatsAppContactInfo();
+      // Only open if the contact is unknown (number is present, name is not found)
+      if (!nameFound && number) {
+        const pane = document.getElementById('wa-crm-add-contact-pane');
+        if (pane && pane.style.display !== 'none') {
+          pane.style.display = 'none';
+          return;
+        }
+        openAddContactPane();
       }
-      openAddContactPane();
     };
   }
 }
@@ -235,6 +237,18 @@ function addGroupsTopBarHandler() {
   }
 }
 
+function addHomeClickHandler() {
+  const homeIcon = document.getElementById('sidebar-icon-home');
+  if (homeIcon) {
+    homeIcon.onclick = function() {
+      const allFilter = document.querySelector('#all-filter');
+      if (allFilter) {
+        allFilter.click();
+      }
+    };
+  }
+}
+
 // Automatically open pane for unsaved contacts
 const unsavedContactObserver = new MutationObserver(() => {
   // Always fetch latest info
@@ -254,3 +268,6 @@ addAddContactClickHandler();
 addRefreshClickHandler();
 addAllTopBarHandler();
 addGroupsTopBarHandler();
+addHomeClickHandler();
+
+// Removed enable/disable popup message listener and chrome.storage UI logic
