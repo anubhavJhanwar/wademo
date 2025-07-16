@@ -1,1 +1,0 @@
-// popup.js reverted to previous state, logout button logic removed 
