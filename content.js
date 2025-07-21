@@ -924,3 +924,171 @@ function setupDashboardExportIcon() {
   };
 }
 
+// --- INVENTORY MANAGEMENT (Contact Book Icon) ---
+function getInventory() {
+  try {
+    return JSON.parse(localStorage.getItem('waCrmInventory')) || { product1: 0, product2: 0 };
+  } catch {
+    return { product1: 0, product2: 0 };
+  }
+}
+function setInventory(inv) {
+  localStorage.setItem('waCrmInventory', JSON.stringify(inv));
+}
+function openInventoryPane() {
+  let pane = document.getElementById('wa-crm-inventory-pane');
+  if (!pane) {
+    pane = document.createElement('div');
+    pane.id = 'wa-crm-inventory-pane';
+    pane.style.position = 'fixed';
+    pane.style.top = '52px';
+    pane.style.right = '64px';
+    pane.style.width = '370px';
+    pane.style.background = '#fff';
+    pane.style.boxShadow = '-2px 0 8px rgba(0,0,0,0.10)';
+    pane.style.zIndex = '9999';
+    pane.style.fontFamily = 'sans-serif';
+    pane.innerHTML = `
+      <div style="padding: 20px 18px 18px 18px; font-family: sans-serif; min-height: 320px; display: flex; flex-direction: column;">
+        <div style="padding-bottom: 12px; border-bottom: 1px solid #eee; position: relative;">
+          <div style="font-weight: 600; font-size: 18px; color: #222;">Inventory Management</div>
+          <button id="wa-crm-close-inventory-pane" style="position: absolute; top: 0; right: 0; background: #eee; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 16px; cursor: pointer;">&times;</button>
+        </div>
+        <div style="padding: 18px 0 0 0; flex: 1; display: flex; flex-direction: column; gap: 18px;">
+          <form id="wa-crm-inventory-form" style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 10px;">
+            <div style="display: flex; flex-direction: column;">
+              <label style="font-size: 13px; color: #444; margin-bottom: 4px;">Product 1 Stock</label>
+              <input id="wa-crm-inventory-product1" type="number" min="0" step="1" style="width: 90px; padding: 7px 8px; border-radius: 6px; border: 1px solid #bbb; background: #f6f6f6; font-size: 15px;" required />
+            </div>
+            <div style="display: flex; flex-direction: column;">
+              <label style="font-size: 13px; color: #444; margin-bottom: 4px;">Product 2 Stock</label>
+              <input id="wa-crm-inventory-product2" type="number" min="0" step="1" style="width: 90px; padding: 7px 8px; border-radius: 6px; border: 1px solid #bbb; background: #f6f6f6; font-size: 15px;" required />
+            </div>
+            <button type="submit" style="background: #2a4bff; color: #fff; border: none; border-radius: 6px; padding: 8px 18px; font-size: 15px; font-weight: 600; cursor: pointer;">Update</button>
+          </form>
+          <div style="display: flex; gap: 18px; justify-content: center; align-items: flex-end;">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <canvas id="wa-crm-inventory-pie-product1" width="90" height="90"></canvas>
+              <span id="wa-crm-inventory-label-product1" style="margin-top:6px;font-size:14px;font-weight:600;">Product 1</span>
+              <div id="wa-crm-inventory-warning-product1" style="margin-top:4px;font-size:13px;font-weight:600;"></div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <canvas id="wa-crm-inventory-pie-product2" width="90" height="90"></canvas>
+              <span id="wa-crm-inventory-label-product2" style="margin-top:6px;font-size:14px;font-weight:600;">Product 2</span>
+              <div id="wa-crm-inventory-warning-product2" style="margin-top:4px;font-size:13px;font-weight:600;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(pane);
+    document.getElementById('wa-crm-close-inventory-pane').onclick = () => { pane.style.display = 'none'; };
+    document.getElementById('wa-crm-inventory-form').onsubmit = function(e) {
+      e.preventDefault();
+      const p1 = parseInt(document.getElementById('wa-crm-inventory-product1').value);
+      const p2 = parseInt(document.getElementById('wa-crm-inventory-product2').value);
+      setInventory({ product1: isNaN(p1) ? 0 : p1, product2: isNaN(p2) ? 0 : p2 });
+      renderInventoryCharts();
+      renderInventoryWarning();
+    };
+  } else {
+    pane.style.display = 'block';
+  }
+  // Set input values and render charts/warning
+  const inv = getInventory();
+  document.getElementById('wa-crm-inventory-product1').value = inv.product1;
+  document.getElementById('wa-crm-inventory-product2').value = inv.product2;
+  renderInventoryCharts();
+  renderInventoryWarning();
+}
+function renderInventoryCharts() {
+  const inv = getInventory();
+  const canvas1 = document.getElementById('wa-crm-inventory-pie-product1');
+  const canvas2 = document.getElementById('wa-crm-inventory-pie-product2');
+  if (!canvas1 || !canvas2) return;
+  const ctx1 = canvas1.getContext('2d');
+  const ctx2 = canvas2.getContext('2d');
+  // Draw donut for product 1
+  drawInventoryDonut(ctx1, inv.product1, 100, ['#673ab7', '#00bcd4'], '#673ab7');
+  ctx1.font = '16px sans-serif';
+  ctx1.fillStyle = inv.product1 <= 5 ? '#e74c3c' : '#673ab7';
+  ctx1.textAlign = 'center';
+  ctx1.textBaseline = 'middle';
+  ctx1.fillText(`${inv.product1}`, 45, 45);
+  // Draw donut for product 2
+  drawInventoryDonut(ctx2, inv.product2, 100, ['#f44336', '#ffeb3b'], '#f44336');
+  ctx2.font = '16px sans-serif';
+  ctx2.fillStyle = inv.product2 <= 5 ? '#e74c3c' : '#f44336';
+  ctx2.textAlign = 'center';
+  ctx2.textBaseline = 'middle';
+  ctx2.fillText(`${inv.product2}`, 45, 45);
+  // Red label if low
+  document.getElementById('wa-crm-inventory-label-product1').style.color = inv.product1 <= 5 ? '#e74c3c' : '#673ab7';
+  document.getElementById('wa-crm-inventory-label-product2').style.color = inv.product2 <= 5 ? '#e74c3c' : '#f44336';
+}
+function drawInventoryDonut(ctx, value, max, gradientColors, pointerColor) {
+  const cx = 45, cy = 45, r = 36, thickness = 8;
+  ctx.clearRect(0, 0, 90, 90);
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+  ctx.strokeStyle = '#eee';
+  ctx.lineWidth = thickness;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+  if (max > 0 && value > 0) {
+    const startAngle = -0.5 * Math.PI;
+    const endAngle = startAngle + (value / max) * 2 * Math.PI;
+    const grad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+    grad.addColorStop(0, gradientColors[0]);
+    grad.addColorStop(1, gradientColors[1]);
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, startAngle, endAngle);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = thickness;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    const px = cx + r * Math.cos(endAngle);
+    const py = cy + r * Math.sin(endAngle);
+    ctx.beginPath();
+    ctx.arc(px, py, thickness / 2 + 1, 0, 2 * Math.PI);
+    ctx.fillStyle = pointerColor;
+    ctx.shadowColor = pointerColor;
+    ctx.shadowBlur = 4;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+}
+function renderInventoryWarning() {
+  const inv = getInventory();
+  let warning = '';
+  if (inv.product1 <= 5) warning += '⚠️ Product 1 is low on stock!\n';
+  if (inv.product2 <= 5) warning += '⚠️ Product 2 is low on stock!';
+  // Show warning in both product warning divs
+  document.getElementById('wa-crm-inventory-warning-product1').textContent = inv.product1 <= 5 ? '⚠️ Low stock!' : '';
+  document.getElementById('wa-crm-inventory-warning-product2').textContent = inv.product2 <= 5 ? '⚠️ Low stock!' : '';
+}
+// Deduct inventory when transaction is added
+const origAddDashboardTransaction = addDashboardTransaction;
+addDashboardTransaction = function(rate, qty, paid, product) {
+  // Deduct inventory
+  const inv = getInventory();
+  if (product === 'Product 1') inv.product1 = Math.max(0, (inv.product1 || 0) - qty);
+  if (product === 'Product 2') inv.product2 = Math.max(0, (inv.product2 || 0) - qty);
+  setInventory(inv);
+  renderInventoryCharts();
+  renderInventoryWarning();
+  // Call original
+  origAddDashboardTransaction(rate, qty, paid, product);
+};
+// Contact Book icon opens inventory pane
+const contactBookIcon = document.getElementById('sidebar-icon-contactBook');
+if (contactBookIcon) {
+  contactBookIcon.onclick = function() {
+    const pane = document.getElementById('wa-crm-inventory-pane');
+    if (pane && pane.style.display !== 'none') {
+      pane.style.display = 'none';
+      return;
+    }
+    openInventoryPane();
+  };
+}
