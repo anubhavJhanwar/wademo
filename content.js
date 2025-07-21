@@ -399,8 +399,18 @@ function openDashboardPane() {
     pane.innerHTML = `
       <div style="padding: 18px 12px 0 12px; position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0;">
         <div style="position:absolute;top:10px;right:10px;z-index:2;display:flex;gap:8px;">
-          <button id="wa-crm-dashboard-reset" title="Reset" style="background: #eee; color: #e74c3c; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center;">&#8635;</button>
-          <button id="wa-crm-close-dashboard-pane" style="background: #eee; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 16px; cursor: pointer;">&times;</button>
+          <div id="wa-crm-dashboard-export-icon" style="display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;background:#eee;border-radius:50%;width:28px;height:28px;">
+            <img src="${chrome.runtime.getURL('icons/icon9.png')}" alt="Export" style="width:20px;height:20px;" />
+            <span id="wa-crm-dashboard-export-tooltip" style="display:none;position:absolute;top:32px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:4px 10px;border-radius:6px;font-size:13px;white-space:nowrap;z-index:10;">Export Data</span>
+          </div>
+          <div id="wa-crm-dashboard-reset-icon" style="display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;background:#eee;border-radius:50%;width:28px;height:28px;">
+            <span style="color:#e74c3c;font-size:18px;font-weight:700;">&#8635;</span>
+            <span id="wa-crm-dashboard-reset-tooltip" style="display:none;position:absolute;top:32px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:4px 10px;border-radius:6px;font-size:13px;white-space:nowrap;z-index:10;">Reset Data</span>
+          </div>
+          <div id="wa-crm-dashboard-close-icon" style="display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;background:#eee;border-radius:50%;width:28px;height:28px;">
+            <span style="font-size:16px;color:#111;">&times;</span>
+            <span id="wa-crm-dashboard-close-tooltip" style="display:none;position:absolute;top:32px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:4px 10px;border-radius:6px;font-size:13px;white-space:nowrap;z-index:10;">Close</span>
+          </div>
         </div>
         <div style="font-size: 26px; font-weight: 700; margin-bottom: 8px; color: #2a4bff;">Admin Dashboard</div>
         <div style="height: 1px; background: #e6e6e6; margin-bottom: 18px;"></div>
@@ -449,7 +459,20 @@ function openDashboardPane() {
           </div>
           <button type="submit" style="background: #2a4bff; color: #fff; border: none; border-radius: 6px; padding: 8px 18px; font-size: 15px; font-weight: 600; cursor: pointer;">Add</button>
         </form>
-        <div style="font-size: 18px; font-weight: 600; color: #222; margin-bottom: 8px;">Transaction History</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <div style="font-size: 18px; font-weight: 600; color: #222;">Transaction History</div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <select id="wa-crm-dashboard-filter" style="padding: 3px 8px; border-radius: 6px; border: 1px solid #bbb; font-size: 14px; background: #f0f1f3; color: #111; min-width: 90px;">
+              <option value="all">All</option>
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="custom">Custom</option>
+            </select>
+            <input type="date" id="wa-crm-dashboard-date-from" style="display:none; margin-left:4px; padding:3px 6px; border-radius:6px; border:1px solid #bbb; font-size:13px; background:#f0f1f3; color:#111;" />
+            <input type="date" id="wa-crm-dashboard-date-to" style="display:none; margin-left:2px; padding:3px 6px; border-radius:6px; border:1px solid #bbb; font-size:13px; background:#f0f1f3; color:#111;" />
+          </div>
+        </div>
         <div id="wa-crm-dashboard-history" style="flex:1; overflow-y: auto; max-height: 320px; border: 1px solid #eee; border-radius: 8px; background: #f4f7fa; padding: 10px 0 10px 0;"></div>
       </div>
       <style>
@@ -518,10 +541,11 @@ function openDashboardPane() {
       </style>
     `;
     document.body.appendChild(pane);
-    document.getElementById('wa-crm-close-dashboard-pane').onclick = () => {
+    // Icon handlers and tooltips
+    document.getElementById('wa-crm-dashboard-close-icon').onclick = () => {
       pane.style.display = 'none';
     };
-    document.getElementById('wa-crm-dashboard-reset').onclick = function() {
+    document.getElementById('wa-crm-dashboard-reset-icon').onclick = function() {
       if (confirm('Reset all dashboard data?')) {
         localStorage.removeItem('waCrmDashboardTransactions');
         renderDashboardStats();
@@ -529,6 +553,23 @@ function openDashboardPane() {
         renderDashboardPieCharts();
       }
     };
+    // Tooltips
+    const exportIconDiv = document.getElementById('wa-crm-dashboard-export-icon');
+    const exportTooltip = document.getElementById('wa-crm-dashboard-export-tooltip');
+    exportIconDiv.onmouseenter = function() { exportTooltip.style.display = 'block'; };
+    exportIconDiv.onmouseleave = function() { exportTooltip.style.display = 'none'; };
+    exportIconDiv.onclick = function() {
+      const txs = getFilteredDashboardTransactions();
+      downloadTransactionsCSV(txs);
+    };
+    const resetIconDiv = document.getElementById('wa-crm-dashboard-reset-icon');
+    const resetTooltip = document.getElementById('wa-crm-dashboard-reset-tooltip');
+    resetIconDiv.onmouseenter = function() { resetTooltip.style.display = 'block'; };
+    resetIconDiv.onmouseleave = function() { resetTooltip.style.display = 'none'; };
+    const closeIconDiv = document.getElementById('wa-crm-dashboard-close-icon');
+    const closeTooltip = document.getElementById('wa-crm-dashboard-close-tooltip');
+    closeIconDiv.onmouseenter = function() { closeTooltip.style.display = 'block'; };
+    closeIconDiv.onmouseleave = function() { closeTooltip.style.display = 'none'; };
     // Form logic
     document.getElementById('wa-crm-dashboard-form').onsubmit = function(e) {
       e.preventDefault();
@@ -550,6 +591,8 @@ function openDashboardPane() {
   renderDashboardStats();
   renderDashboardHistory();
   renderDashboardPieCharts();
+  setupDashboardFilterAndDownload();
+  setupDashboardExportIcon();
 }
 
 function getDashboardTransactions() {
@@ -616,10 +659,91 @@ function renderDashboardStats() {
   `;
 }
 
+// --- FILTER AND DOWNLOAD LOGIC ---
+
+let dashboardFilter = 'all';
+let dashboardDateFrom = null;
+let dashboardDateTo = null;
+
+function setupDashboardFilterAndDownload() {
+  const filterSelect = document.getElementById('wa-crm-dashboard-filter');
+  const dateFromInput = document.getElementById('wa-crm-dashboard-date-from');
+  const dateToInput = document.getElementById('wa-crm-dashboard-date-to');
+  if (!filterSelect) return;
+
+  filterSelect.onchange = function() {
+    dashboardFilter = this.value;
+    if (dashboardFilter === 'custom') {
+      dateFromInput.style.display = 'inline-block';
+      dateToInput.style.display = 'inline-block';
+    } else {
+      dateFromInput.style.display = 'none';
+      dateToInput.style.display = 'none';
+      dashboardDateFrom = null;
+      dashboardDateTo = null;
+      renderDashboardHistory();
+    }
+    if (dashboardFilter !== 'custom') {
+      renderDashboardHistory();
+    }
+  };
+
+  dateFromInput.onchange = function() {
+    dashboardDateFrom = this.value;
+    renderDashboardHistory();
+  };
+  dateToInput.onchange = function() {
+    dashboardDateTo = this.value;
+    renderDashboardHistory();
+  };
+}
+
+function getFilteredDashboardTransactions() {
+  const txs = getDashboardTransactions();
+  if (dashboardFilter === 'all') return txs;
+  const now = new Date();
+  if (dashboardFilter === 'today') {
+    return txs.filter(tx => {
+      const d = new Date(tx.date);
+      return d.toDateString() === now.toDateString();
+    });
+  }
+  if (dashboardFilter === 'week') {
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+    startOfWeek.setHours(0,0,0,0);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23,59,59,999);
+    return txs.filter(tx => {
+      const d = new Date(tx.date);
+      return d >= startOfWeek && d <= endOfWeek;
+    });
+  }
+  if (dashboardFilter === 'month') {
+    const month = now.getMonth();
+    const year = now.getFullYear();
+    return txs.filter(tx => {
+      const d = new Date(tx.date);
+      return d.getMonth() === month && d.getFullYear() === year;
+    });
+  }
+  if (dashboardFilter === 'custom' && dashboardDateFrom && dashboardDateTo) {
+    const from = new Date(dashboardDateFrom);
+    const to = new Date(dashboardDateTo);
+    to.setHours(23,59,59,999);
+    return txs.filter(tx => {
+      const d = new Date(tx.date);
+      return d >= from && d <= to;
+    });
+  }
+  return txs;
+}
+
 function renderDashboardHistory() {
   const historyDiv = document.getElementById('wa-crm-dashboard-history');
   if (!historyDiv) return;
-  const transactions = getDashboardTransactions();
+  const transactions = getFilteredDashboardTransactions();
   if (transactions.length === 0) {
     historyDiv.innerHTML = '<div style="color:#888; text-align:center; padding: 24px 0;">No transactions yet.</div>';
     return;
@@ -643,11 +767,17 @@ function renderDashboardHistory() {
   document.querySelectorAll('.wa-crm-mark-paid').forEach(cb => {
     cb.addEventListener('change', function() {
       if (this.checked) {
-        const idx = parseInt(this.getAttribute('data-idx'));
-        const txs = getDashboardTransactions();
-        if (txs[idx] && !txs[idx].paid) {
-          txs[idx].paid = true;
-          setDashboardTransactions(txs);
+        // Find the correct transaction index in the filtered list, then update the original
+        const filteredIdx = parseInt(this.getAttribute('data-idx'));
+        const filteredTxs = getFilteredDashboardTransactions();
+        const tx = filteredTxs[filteredIdx];
+        if (!tx) return;
+        // Find the index in the full list
+        const allTxs = getDashboardTransactions();
+        const origIdx = allTxs.findIndex(t => t.date === tx.date && t.total === tx.total && t.name === tx.name);
+        if (origIdx !== -1 && !allTxs[origIdx].paid) {
+          allTxs[origIdx].paid = true;
+          setDashboardTransactions(allTxs);
           renderDashboardStats();
           renderDashboardHistory();
           renderDashboardPieCharts();
@@ -655,6 +785,35 @@ function renderDashboardHistory() {
       }
     });
   });
+}
+
+function downloadTransactionsCSV(transactions) {
+  if (!transactions || !transactions.length) return;
+  const header = ['Name', 'Product', 'Date', 'Rate', 'Quantity', 'Total', 'Paid'];
+  const rows = transactions.map(tx => [
+    tx.name || '',
+    tx.product || '',
+    new Date(tx.date).toLocaleString(),
+    tx.rate,
+    tx.qty,
+    tx.total,
+    tx.paid ? 'Yes' : 'No'
+  ]);
+  let csv = header.join(',') + '\n';
+  rows.forEach(row => {
+    csv += row.map(val => '"' + String(val).replace(/"/g, '""') + '"').join(',') + '\n';
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'transactions.csv';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
 }
 
 function renderDashboardPieCharts() {
@@ -746,5 +905,22 @@ function addAdminPanelClickHandler() {
       openDashboardPane();
     };
   }
+}
+
+// Setup export icon logic
+function setupDashboardExportIcon() {
+  const exportIconDiv = document.getElementById('wa-crm-dashboard-export-icon');
+  const tooltip = document.getElementById('wa-crm-dashboard-export-tooltip');
+  if (!exportIconDiv || !tooltip) return;
+  exportIconDiv.onmouseenter = function() {
+    tooltip.style.display = 'block';
+  };
+  exportIconDiv.onmouseleave = function() {
+    tooltip.style.display = 'none';
+  };
+  exportIconDiv.onclick = function() {
+    const txs = getFilteredDashboardTransactions();
+    downloadTransactionsCSV(txs);
+  };
 }
 
